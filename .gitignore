@@ -1,0 +1,29 @@
+﻿@"
+# Node / Next.js
+node_modules/
+.next/
+out/
+dist/
+coverage/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Env & secrets
+.env
+.env.*
+.env.local
+
+# GROS médias : NE PAS VERSIONNER
+public/videos/
+public/posters/
+public/thumbs/
+public/*.mp4
+public/*.webm
+public/*.mov
+public/*.zip
+
+# OS
+.DS_Store
+Thumbs.db
+"@ | Set-Content -Encoding UTF8 .gitignore
