@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2022",
     "lib": ["dom", "dom.iterable", "es2022"],
-    "allowJs": false,
+    "allowJs": true,                     // ✅ IMPORTANT : doit être true avec Next
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
@@ -16,7 +16,6 @@
     "plugins": [{ "name": "next" }],
     "types": ["stripe-event-types"],
 
-    // 🔑 Ajout alias :
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
