@@ -1,59 +1,42 @@
-// src/app/subscribe/page.tsx
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
-export default function SubscribeEmailPage() {
-  const router = useRouter();
+export default function HomePage() {
   const [email, setEmail] = useState("");
-  const [err, setErr] = useState("");
+  const router = useRouter();
 
-  function submit(e: React.FormEvent) {
+  const start = (e: React.FormEvent) => {
     e.preventDefault();
-    const clean = email.trim();
-    const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clean);
-    if (!ok) {
-      setErr("L’adresse e-mail est obligatoire.");
-      return;
-    }
-    // Pose le drapeau pour afficher le bouton DEV
-    try {
-      sessionStorage.setItem("dev:allow-continue", "1");
-    } catch {}
-    router.push(`/subscribe/inbox?email=${encodeURIComponent(clean)}`);
-  }
+    router.push(`/subscribe/plans?email=${encodeURIComponent(email)}`);
+  };
 
   return (
-    <main className="container" style={{ maxWidth: 1200 }}>
-      <section className="hero-modern" style={{ marginTop: 28 }}>
-        <div className="hero-overlay" />
-        <div className="hero-content">
-          <h1 className="auth-title" style={{ marginBottom: 8 }}>
-            Plateforme de Streaming <br /> Spirituel
-          </h1>
-          <p className="auth-sub">À partir de 7,99 €/mois. Annulable à tout moment.</p>
+    <>
+      <section className="hero">
+        <div className="container">
+          <h1 className="hero-title">Plateforme de Streaming<br/>Spirituel</h1>
+          <p className="hero-sub">À partir de <strong>7,99 €</strong>/mois. Annulable à tout moment.</p>
 
-          <form onSubmit={submit} className="form-inline" style={{ marginTop: 12 }}>
+          <form onSubmit={start} className="glass-panel" style={{display:"flex", gap:10, alignItems:"center", maxWidth:560}}>
             <input
-              className="input-lg"
               type="email"
+              required
               placeholder="Adresse e-mail"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              aria-label="Adresse e-mail"
+              onChange={(e)=>setEmail(e.target.value)}
+              className="search"
+              style={{flex:1}}
             />
             <button className="btn-cta" type="submit">S’abonner</button>
           </form>
 
-          {err && <p style={{ color: "#ffb3b3", marginTop: 8 }}>{err}</p>}
-
-          <p className="notice">
-            En cliquant sur <strong>S’abonner</strong>, vous acceptez de recevoir un e-mail
-            pour compléter la configuration de votre compte <strong>Hashem Productions</strong>.
+          <p className="mt" style={{color:"var(--muted)"}}>
+            En cliquant sur <strong>S’abonner</strong>, vous acceptez de recevoir un e-mail pour compléter la configuration de votre compte <strong>Hashem Productions</strong>.
           </p>
         </div>
       </section>
-    </main>
+    </>
   );
 }
