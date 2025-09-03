@@ -12,9 +12,9 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "types": ["stripe-event-types"],
     "esModuleInterop": true,
     "plugins": [{ "name": "next" }],
+    "types": ["stripe-event-types"],
 
     // 🔑 Ajout alias :
     "baseUrl": ".",
