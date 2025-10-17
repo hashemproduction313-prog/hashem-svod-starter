@@ -1,0 +1,13 @@
+export const dynamic = "force-dynamic";
+
+export default function CancelPage() {
+  return (
+    <main className="min-h-[60vh] flex flex-col items-center justify-center px-6 py-16">
+      <h1 className="text-3xl font-semibold mb-3">Paiement annulé</h1>
+      <p className="opacity-80 mb-6 text-center">
+        Aucun débit n’a été effectué. Vous pouvez réessayer quand vous voulez.
+      </p>
+      <a href="/subscribe" className="underline">Retour aux offres</a>
+    </main>
+  );
+}

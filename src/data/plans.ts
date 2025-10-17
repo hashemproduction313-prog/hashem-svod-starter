@@ -1,44 +1,52 @@
 // src/data/plans.ts
+export type PlanId = "ad" | "standard" | "premium";
 
-export type PlanId = "ad" | "std" | "prem";
-
-export type PlanMeta = {
+export type Plan = {
   id: PlanId;
   name: string;
-  badge: string;   // ex: "1080p", "4K + HDR"
-  price: string;   // ex: "14,99 € / mois"
+  price: string;   // affichage
+  priceId: string; // Stripe price_xxx
 };
 
-export const PLANS: Record<PlanId, PlanMeta> = {
+// Priorité aux clés serveur (STRIPE_*), sinon NEXT_PUBLIC_*
+const ENV_PRICE_AD =
+  process.env.STRIPE_PRICE_STANDARD_ADS ||
+  process.env.NEXT_PUBLIC_STRIPE_PRICE_STANDARD_ADS ||
+  "";
+
+const ENV_PRICE_STANDARD =
+  process.env.STRIPE_PRICE_STANDARD ||
+  process.env.NEXT_PUBLIC_STRIPE_PRICE_STANDARD ||
+  "";
+
+const ENV_PRICE_PREMIUM =
+  process.env.STRIPE_PRICE_PREMIUM ||
+  process.env.NEXT_PUBLIC_STRIPE_PRICE_PREMIUM ||
+  "";
+
+export const PLANS: Record<PlanId, Plan> = {
   ad: {
     id: "ad",
-    name: "Standard avec pub",
-    badge: "1080p",
+    name: "Standard avec Pub",
     price: "7,99 € / mois",
+    priceId: ENV_PRICE_AD || "price_1SItgo2fDeTmjRl7ALkhlBzI",
   },
-  std: {
-    id: "std",
+  standard: {
+    id: "standard",
     name: "Standard",
-    badge: "1080p",
     price: "14,99 € / mois",
+    priceId: ENV_PRICE_STANDARD || "price_1SItmG2fDeTmjRl7qEKz7Ezd",
   },
-  prem: {
-    id: "prem",
+  premium: {
+    id: "premium",
     name: "Premium",
-    badge: "4K + HDR",
     price: "21,99 € / mois",
+    priceId: ENV_PRICE_PREMIUM || "price_1SItoC2fDeTmjRl71w0Ld5jn",
   },
 };
 
-// ✅ unique, pas de doublon, pas de default export
-export function normalizePlanId(q?: string | null): PlanId {
-  const v = (q ?? "").trim().toLowerCase();
-  if (v === "ad" || v === "std" || v === "prem") return v;
-  return "std"; // valeur par défaut
-}
-
-// (optionnel) pour afficher un libellé complet si besoin
-export function planFullLabel(id: PlanId): string {
-  const p = PLANS[id];
-  return `${p.name} (${p.badge})`;
+export function normalizePlanId(v: any): PlanId {
+  const s = String(v ?? "").toLowerCase().trim();
+  if (s === "ad" || s === "standard" || s === "premium") return s;
+  return "ad";
 }
