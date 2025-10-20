@@ -1,9 +1,10 @@
 // src/app/subscribe/welcome/page.tsx
 "use client";
+export const dynamic = "force-dynamic";
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { PLANS, normalizePlanId } from "../../../data/plans";
+import { PLANS, normalizePlanId } from "@/data/plans";
 
 export default function WelcomePage() {
   const search = useSearchParams();
@@ -37,14 +38,11 @@ export default function WelcomePage() {
         <h2 className="section-title">Commencer à regarder</h2>
 
         <div className="grid">
-          {/* ⚠️ Chemins corrigés : /posters/... */}
           <Link href="/title/9" className="card-modern card-link">
             <img src="/posters/poster9.jpg" alt="Le Lever" />
             <h3>Le Lever</h3>
           </Link>
 
-          {/* Si tu n’as pas encore poster1.jpg et poster5.jpg,
-              duplique poster9.jpg dans /public/posters/ ou remplace ci-dessous par des fichiers existants */}
           <Link href="/title/1" className="card-modern card-link">
             <img src="/posters/poster1.jpg" alt="La 7ème Alliance" />
             <h3>La 7ème Alliance</h3>

@@ -1,13 +1,11 @@
-// src/app/subscribe/plans/page.tsx
 "use client";
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { PLANS, type PlanId } from "@/plans";
+import { PLANS, type PlanId } from "@/data/plans"; // <- corrigé
 
 export const dynamic = "force-dynamic";
 
-// Ordre d’affichage des offres
 const ORDER: PlanId[] = ["ad", "standard", "premium"];
 
 export default function PlansPage() {
@@ -29,7 +27,6 @@ export default function PlansPage() {
             const href = `/subscribe/payment?plan=${p.id}${
               email ? `&email=${encodeURIComponent(email)}` : ""
             }`;
-
             const recommended = id === "standard";
 
             return (
@@ -48,10 +45,6 @@ export default function PlansPage() {
                       </span>
                     )}
                   </div>
-                  {/* Affiche le badge seulement s’il existe dans la définition du plan */}
-                  {"badge" in p && (p as any).badge ? (
-                    <span className="badge">{(p as any).badge}</span>
-                  ) : null}
                 </header>
 
                 <div className="plan-price">{p.price}</div>
