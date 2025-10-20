@@ -1,21 +1,33 @@
 "use client";
 export const dynamic = "force-dynamic";
 
-import { PLANS, type PlanId } from "../../data/plans";
+import { PLANS, type PlanId } from "@/data/plans";
 import { useSearchParams } from "next/navigation";
 
-const ORDER: PlanId[] = ["ad", "std", "prem"];
+const ORDER: PlanId[] = ["ad", "standard", "premium"];
 
 export default function PricingPage() {
   const search = useSearchParams();
   const email = (search.get("email") || "").trim();
 
+  const paymentsEnabled =
+    (process.env.NEXT_PUBLIC_PAYMENTS_ENABLED ?? "").toLowerCase() === "true";
+
   async function startCheckout(plan: PlanId) {
+    // Plateforme gratuite pour l’instant ?
+    if (!paymentsEnabled) {
+      alert(
+        "Le paiement en ligne est temporairement désactivé. " +
+        "La plateforme est gratuite pour le moment."
+      );
+      return;
+    }
+
     try {
       const res = await fetch("/api/create-checkout", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ plan }),
+        body: JSON.stringify({ plan, email }),
       });
 
       const contentType = res.headers.get("content-type") || "";
@@ -25,11 +37,7 @@ export default function PricingPage() {
 
       let json: any = null;
       if (asJson) {
-        try {
-          json = JSON.parse(raw);
-        } catch {
-          // JSON invalide
-        }
+        try { json = JSON.parse(raw); } catch {}
       }
 
       if (!res.ok) {
@@ -41,7 +49,7 @@ export default function PricingPage() {
         return;
       }
 
-      window.location.href = json.url;
+      window.location.href = json.url as string;
     } catch {
       alert("Impossible de démarrer le paiement.");
     }
@@ -59,7 +67,7 @@ export default function PricingPage() {
         <div className="plan-grid" role="list" aria-label="Offres d’abonnement">
           {ORDER.map((id) => {
             const p = PLANS[id];
-            const recommended = id === "std";
+            const recommended = id === "standard";
 
             return (
               <article
@@ -77,9 +85,6 @@ export default function PricingPage() {
                       </span>
                     )}
                   </div>
-                  <span className="badge" aria-label={`Qualité ${p.badge}`}>
-                    {p.badge}
-                  </span>
                 </header>
 
                 <div className="plan-price">{p.price}</div>
@@ -93,7 +98,7 @@ export default function PricingPage() {
                       <li>• Publicités limitées</li>
                     </>
                   )}
-                  {id === "std" && (
+                  {id === "standard" && (
                     <>
                       <li>• Sans pub</li>
                       <li>• 1080p (Full HD)</li>
@@ -101,7 +106,7 @@ export default function PricingPage() {
                       <li>• Téléchargements</li>
                     </>
                   )}
-                  {id === "prem" && (
+                  {id === "premium" && (
                     <>
                       <li>• Sans pub</li>
                       <li>• 4 appareils en simultané</li>

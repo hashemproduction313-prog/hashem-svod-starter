@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { normalizePlanId, PLANS } from "@/plans"; // <= alias propre
+import { normalizePlanId, PLANS } from "@/data/plans"; // <= alias propre
 
 export const dynamic = "force-dynamic";
 
@@ -145,3 +145,4 @@ export default function PaymentPage() {
     </main>
   );
 }
+
