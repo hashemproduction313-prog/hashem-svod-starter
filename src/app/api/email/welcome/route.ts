@@ -7,28 +7,14 @@ import { normalizePlanId } from "@/data/plans";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-type ApiSuccess = {
-  ok: true;
-  id: string | null;
-  mailStatus: string; // ← au lieu de "status"
-};
-
-type ApiError = {
-  ok: false;
-  error: string;
-};
-
 export async function POST(req: Request) {
   try {
-    const { to, plan } = (await req.json().catch(() => ({}))) as {
-      to?: string;
-      plan?: unknown;
-    };
-
-    const planId = normalizePlanId(plan);
+    const body = await req.json().catch(() => ({} as any));
+    const to = (body?.to ?? "").trim();
+    const planId = normalizePlanId(body?.plan);
 
     if (!to || !planId) {
-      return NextResponse.json<ApiError>(
+      return NextResponse.json(
         { ok: false, error: "Missing fields: to, plan" },
         { status: 400 }
       );
@@ -41,6 +27,7 @@ export async function POST(req: Request) {
 
     const html = welcomeEmailHTML({ email: to, plan: planId });
 
+    // Pas d’import Resend au top-level → build-safe
     const { data } = await sendResendEmail({
       from,
       to,
@@ -48,13 +35,13 @@ export async function POST(req: Request) {
       html,
     });
 
-    return NextResponse.json<ApiSuccess>({
-      ok: true,
-      id: data?.id ?? null,
-      mailStatus: data?.status ?? "sent",
-    });
+    // On évite tout problème de type avec un cast souple
+    const id = (data as any)?.id ?? null;
+    const delivered = (data as any)?.status ?? "sent";
+
+    return NextResponse.json({ ok: true, id, status: delivered });
   } catch (e: any) {
-    return NextResponse.json<ApiError>(
+    return NextResponse.json(
       { ok: false, error: e?.message || "Server error" },
       { status: 500 }
     );
