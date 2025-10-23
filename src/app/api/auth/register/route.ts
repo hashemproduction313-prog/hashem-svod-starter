@@ -10,6 +10,25 @@ const supabaseAdmin = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
+/** Utilitaire: envoi NON bloquant du mail de bienvenue */
+async function sendWelcomeEmail(to: string, origin: string, plan: "ad" | "standard" | "premium" = "standard") {
+  try {
+    const base = process.env.NEXT_PUBLIC_APP_URL || origin;
+    const url = `${base}/api/email/welcome`;
+    await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      // tu peux changer le plan par défaut ici si besoin
+      body: JSON.stringify({ to, plan }),
+      // on ne bloque pas la requête d’inscription sur ce call
+      cache: "no-store",
+    });
+  } catch (e) {
+    // On log juste — on n’échoue pas l’inscription si l’email tombe en erreur
+    console.warn("[register] welcome email failed (non-blocking):", (e as any)?.message);
+  }
+}
+
 /**
  * Recherche d'un utilisateur par e-mail via listUsers (pagination).
  * On parcourt les pages jusqu'à trouver l'utilisateur ou jusqu'à ce qu'il n'y ait plus de résultats.
@@ -33,8 +52,7 @@ async function findUserByEmail(email: string): Promise<User | null> {
     const found = users.find((u) => u.email?.toLowerCase() === email.toLowerCase());
     if (found) return found;
 
-    // si moins que PER_PAGE, il n'y aura pas de page suivante
-    if (users.length < PER_PAGE) break;
+    if (users.length < PER_PAGE) break; // pas de page suivante
   }
   return null;
 }
@@ -90,6 +108,10 @@ export async function POST(req: NextRequest) {
         console.error("updateUserById error:", updErr);
         return NextResponse.json({ ok: false, error: updErr.message }, { status: 500 });
       }
+
+      // ✅ Envoi non bloquant du mail de bienvenue (utilisateur déjà existant)
+      await sendWelcomeEmail(email, req.nextUrl.origin);
+
       return NextResponse.json({ ok: true, created: false, userId: existing.id });
     }
 
@@ -103,6 +125,9 @@ export async function POST(req: NextRequest) {
       console.error("createUser error:", createErr);
       return NextResponse.json({ ok: false, error: createErr.message }, { status: 500 });
     }
+
+    // ✅ Envoi non bloquant du mail de bienvenue (nouvel utilisateur)
+    await sendWelcomeEmail(email, req.nextUrl.origin);
 
     return NextResponse.json({ ok: true, created: true, userId: created.user?.id || null });
   } catch (e: any) {
